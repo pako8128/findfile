@@ -1,4 +1,6 @@
 use std::cell::RefCell;
+use std::env;
+use std::path::PathBuf;
 use std::process;
 use std::rc::Rc;
 
@@ -12,7 +14,7 @@ use log::{error, info};
 struct Cli {
     pattern: String,
     #[structopt(parse(from_os_str))]
-    path: std::path::PathBuf,
+    path: Option<PathBuf>,
 }
 
 fn main() -> Result<(), ExitFailure> {
@@ -22,14 +24,16 @@ fn main() -> Result<(), ExitFailure> {
     info!("Reading commandline argument");
     let args = Cli::from_args();
 
-    if !args.path.is_dir() {
-        error!("{:?} is not a directory", args.path);
+    let path = args.path.unwrap_or(env::current_dir()?);
+
+    if !path.is_dir() {
+        error!("{:?} is not a directory", path);
         process::exit(exitcode::USAGE);
     }
 
     findfile::find(
         &args.pattern,
-        &args.path,
+        &path,
         Rc::new(RefCell::new(std::io::stdout())),
     )?;
 
