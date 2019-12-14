@@ -6,6 +6,9 @@ use std::rc::Rc;
 
 use failure::format_err;
 
+/// Finds the specified **pattern** in the filnames
+/// of directory entries and subdirectory entries of **path**
+/// and writes the full path of the found files to **writer**
 pub fn find(
     pattern: &str,
     path: &PathBuf,
